@@ -12,5 +12,7 @@ router.post('/post', [
 
 router.get('/post/:postId', feed.getPostById)
 
+router.post('/delete/:postId', feed.deletePost)
+
 module.exports = router
 

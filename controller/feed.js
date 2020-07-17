@@ -73,3 +73,13 @@ exports.getPostById = (req,res,next) => {
         next(err)
     })
 }
+
+
+exports.deletePost = (req,res,next) => {
+    const postId = req.params.postId;
+    Post.deleteOne({_id : postId})
+    .then(result => {
+        res.status(200).json({message : 'Delete Succes'})
+    })
+    .catch(err => console.log(err))
+}
