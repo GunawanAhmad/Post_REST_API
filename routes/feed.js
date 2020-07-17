@@ -4,10 +4,13 @@ const router = express.Router()
 const { body } = require('express-validator/check')
 
 router.get('/posts', feed.getPost)
+
 router.post('/post', [
     body('title').isLength({max : 25}),
     body('content').isLength({max : 40})
 ],feed.createPost)
+
+router.get('/post/:postId', feed.getPostById)
 
 module.exports = router
 

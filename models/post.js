@@ -10,11 +10,15 @@ const postSchema = new Schema({
         type : String,
         required : true
     },
-    imageUtl : {
+    imageUrl : {
         type : String
     },
     user : {
         type : Object,
+        required : true
+    },
+    date : {
+        type : String,
         required : true
     }
 }, {timestamps : true})
