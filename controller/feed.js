@@ -1,6 +1,6 @@
 const {validationResult} = require('express-validator')
 const Post = require('../models/post')
-const product = require('../../Shop-App/models/product')
+const fileHelper = require('../util/file')
 
 exports.getPost = (req,res,next) => {
     Post.find()
@@ -18,7 +18,7 @@ exports.getPost = (req,res,next) => {
 exports.createPost = (req,res,next) => {
     const title = req.body.title;
     const content =  req.body.content;
-    const imageUrl = 'images/leaf.jpg'
+    const imageUrl = req.file.path.replace("\\" ,"/")
     const error = validationResult(req)
 
     if(!error.isEmpty()) {
@@ -77,9 +77,45 @@ exports.getPostById = (req,res,next) => {
 
 exports.deletePost = (req,res,next) => {
     const postId = req.params.postId;
-    Post.deleteOne({_id : postId})
-    .then(result => {
-        res.status(200).json({message : 'Delete Succes'})
+    Post.findById(postId)
+    .then(post => {
+        if(!post) {
+            throw new Error('post not found')
+        }
+        if(post.imageUrl) {
+            fileHelper.deleteFile(post.imageUrl)
+        }
+        return Post.deleteOne({_id : postId})
+        .then(result => {
+            res.status(200).json({message : 'Delete Succes'})
+        })
     })
     .catch(err => console.log(err))
+}
+
+exports.editPost = (req,res,next) => {
+    const postId = req.params.postId;
+    const title = req.body.title;
+    const content = req.body.content;
+    
+     
+    Post.findByIdAndUpdate(postId)
+    .then(post => {
+        if(!post) {
+            throw new Error('Post not Found')
+        }
+        if(req.file) {
+            post.imageUrl = req.file.path.replace("\\" ,"/")
+        }
+        post.title = title;
+        post.content = content;
+        return post.save().then(result => {
+            console.log('Edit Succes', result)
+            res.status(200).json({message : 'Edit Succes', post : result})
+        })
+        
+    })
+    .catch(err => {
+        next(err)
+    })
 }
