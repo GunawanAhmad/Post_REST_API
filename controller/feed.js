@@ -1,7 +1,7 @@
 const {validationResult} = require('express-validator')
 const Post = require('../models/post')
 const fileHelper = require('../util/file')
-const ITEM_PER_PAGE = 20;
+const ITEM_PER_PAGE = 2;
 
 exports.getPost = (req,res,next) => {
     const page = +req.query.page || 1;
@@ -17,7 +17,9 @@ exports.getPost = (req,res,next) => {
         console.log(posts)
         res.status(200).json({
             message : 'Succes',
-            post : posts
+            post : posts,
+            totalPost : totalPost,
+            perPage : ITEM_PER_PAGE
         })
     })
     .catch(err => console.log(err))
