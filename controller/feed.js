@@ -1,9 +1,18 @@
 const {validationResult} = require('express-validator')
 const Post = require('../models/post')
 const fileHelper = require('../util/file')
+const ITEM_PER_PAGE = 20;
 
 exports.getPost = (req,res,next) => {
-    Post.find()
+    const page = +req.query.page || 1;
+    let totalPost;
+    Post.countDocuments()
+    .then(num => {
+        totalPost = num
+        return Post.find()
+        .skip((page - 1) * ITEM_PER_PAGE)
+        .limit(ITEM_PER_PAGE)
+    })
     .then(posts => {
         console.log(posts)
         res.status(200).json({
@@ -18,7 +27,10 @@ exports.getPost = (req,res,next) => {
 exports.createPost = (req,res,next) => {
     const title = req.body.title;
     const content =  req.body.content;
-    const imageUrl = req.file.path.replace("\\" ,"/")
+    const imageUrl = undefined;
+    if(req.file) {
+        imageUrl = req.file.path.replace("\\" ,"/")
+    }
     const error = validationResult(req)
 
     if(!error.isEmpty()) {
