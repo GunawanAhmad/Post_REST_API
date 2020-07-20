@@ -3,6 +3,7 @@ const Post = require('../models/post')
 const User = require('../models/user')
 const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 exports.createUser = (req,res,next) => {
     const errors = validationResult(req)
@@ -42,11 +43,14 @@ exports.createUser = (req,res,next) => {
 exports.login = (req,res,next) => {
     const email = req.body.email;
     const password = req.body.password;
+    let loadedUser = null;
     User.findOne({email : email})
     .then(user => {
         if(!user) {
             throw new Error('Email is invalid')
         }
+        loadedUser = user;
+        console.log(loadedUser)
         return bcrypt.compare(password, user.password)
     })
     .then(isEqual=> {
@@ -55,6 +59,11 @@ exports.login = (req,res,next) => {
             error.statusCode = 401
             throw error
         }
+        const token = jwt.sign({
+            email : loadedUser.email,
+            userId : loadedUser._id.toString()
+        }, 'thisissecretkey', { expiresIn : '1h' })
+        res.status(200).json({token : token, userId : loadedUser._id.toString()})
         console.log('login succes')
     })
     .catch(err => {
