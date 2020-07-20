@@ -1,5 +1,6 @@
 const express = require('express')
 const feedRoute = require('./routes/feed')
+const authRoute = require('./routes/auth')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const path = require('path')
@@ -42,12 +43,14 @@ app.use((req,res,next)=> {
 })
 
 app.use('/feed',feedRoute)
+app.use(authRoute)
 
 app.use((error, req, res, next) => {
     const status = error.statusCode || 500;
     const message = error.message;
+    const data = error.data
     console.log(error)
-    res.status(422).json({message : message})
+    res.status(422).json({message : message, errorData : data})
 })
 
 
