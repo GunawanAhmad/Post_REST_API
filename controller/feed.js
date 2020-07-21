@@ -1,5 +1,6 @@
-const {validationResult} = require('express-validator')
+const {validationResult, body} = require('express-validator')
 const Post = require('../models/post')
+const User = require('../models/user')
 const fileHelper = require('../util/file')
 const ITEM_PER_PAGE = 2;
 
@@ -14,7 +15,6 @@ exports.getPost = (req,res,next) => {
         .limit(ITEM_PER_PAGE)
     })
     .then(posts => {
-        console.log(posts)
         res.status(200).json({
             message : 'Succes',
             post : posts,
@@ -30,6 +30,7 @@ exports.createPost = (req,res,next) => {
     const title = req.body.title;
     const content =  req.body.content;
     const imageUrl = undefined;
+    let user;
     if(req.file) {
         imageUrl = req.file.path.replace("\\" ,"/")
     }
@@ -45,16 +46,28 @@ exports.createPost = (req,res,next) => {
         title : title,
         content : content,
         imageUrl : imageUrl,
-        user : {
-            name : 'Gunawan'
-        },
+        user : req.userId,
         date : new Date()
     })
     post.save()
     .then(result => {
+        return User.findById(req.userId)
+    })
+    .then(creator => {
+        
+        user = creator
+        user.posts.push(post)
+        console.log(user)
+        return user.save()
+    })
+    .then(result => {
         res.status(201).json({
             message : 'Status Posted!',
-            post : result
+            post : post,
+            user : {
+                _id : user._id,
+                name : user.name
+            }
         })
     })
     .catch(err => {
@@ -68,7 +81,6 @@ exports.createPost = (req,res,next) => {
 
 exports.getPostById = (req,res,next) => {
     const postId = req.params.postId;
-    console.log(postId)
     Post.findById(postId)
     .then(post => {
         if(post) {

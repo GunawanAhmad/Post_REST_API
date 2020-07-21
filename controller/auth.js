@@ -6,23 +6,30 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 exports.createUser = (req,res,next) => {
-    const errors = validationResult(req)
-    if(!errors.isEmpty()) {
-        const error = new Error('Validation Failed')
-        error.statusCode = 422;
-        error.data = errors.array()
-        throw error
-    }
-
+    // const errors = validationResult(req)
+    // if(!errors.isEmpty()) {
+    //     const error = new Error('Validation Failed')
+    //     error.statusCode = 422;
+    //     error.data = errors.array()
+    //     throw error
+    // }
+    const username = req.body.username;
     const email = req.body.email;
     const name = req.body.name;
     const password = req.body.password;
-
+    const description = req.body.description
+    let image = undefined;
+    if(req.files) {
+        image = req.files['avatar'][0].path.replace("\\" ,"/")
+    }
     bcrypt.hash(password, 12).then(hashedPass => {
         const user = new User({
             email : email,
             name : name,
-            password : hashedPass
+            password : hashedPass,
+            username : username,
+            imageProfile : image,
+            description : description
         })
         return user.save()
     })
@@ -63,7 +70,7 @@ exports.login = (req,res,next) => {
             email : loadedUser.email,
             userId : loadedUser._id.toString()
         }, 'thisissecretkey', { expiresIn : '1h' })
-        res.status(200).json({token : token, userId : loadedUser._id.toString()})
+        res.status(200).json({token : token, username : loadedUser.username})
         console.log('login succes')
     })
     .catch(err => {

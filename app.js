@@ -1,6 +1,7 @@
 const express = require('express')
 const feedRoute = require('./routes/feed')
 const authRoute = require('./routes/auth')
+const userRoute = require('./routes/user')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const path = require('path')
@@ -32,7 +33,13 @@ app.use(bodyParser.json())
 
 
 
-app.use(multer({storage : fileStorage, fileFilter : filterImg}).single('image'))
+app.use(multer({storage : fileStorage, fileFilter : filterImg}).fields([
+    {
+        name : 'avatar',
+        maxCount : 1
+    }
+]))
+// app.use(multer({storage : fileStorage, fileFilter : filterImg}).single('userPhoto'))
 app.use('/images', express.static(path.join(__dirname, 'images')))
 
 app.use((req,res,next)=> {
@@ -44,6 +51,7 @@ app.use((req,res,next)=> {
 
 app.use('/feed',feedRoute)
 app.use(authRoute)
+app.use(userRoute)
 
 app.use((error, req, res, next) => {
     const status = error.statusCode || 500;

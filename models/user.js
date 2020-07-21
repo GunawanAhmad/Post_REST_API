@@ -10,9 +10,19 @@ const userSchema = new Schema({
         type : String,
         required : true
     },
+    username : {
+        type : String,
+        required : true
+    },
+    imageProfile : {
+        type : String,
+    },
     name : {
         type : String,
         required : true
+    },
+    description : {
+        type : String
     },
     posts : [{
         type : Schema.Types.ObjectId,
