@@ -27,12 +27,11 @@ exports.getPost = (req,res,next) => {
 }
 
 exports.createPost = (req,res,next) => {
-    const title = req.body.title;
     const content =  req.body.content;
-    const imageUrl = undefined;
-    let user;
-    if(req.file) {
-        imageUrl = req.file.path.replace("\\" ,"/")
+    let imageUrl = undefined;
+    const username = req.body.username;
+    if(req.files['image']) {
+        imageUrl = req.files['image'][0].path.replace("\\" ,"/")
     }
     const error = validationResult(req)
 
@@ -42,34 +41,32 @@ exports.createPost = (req,res,next) => {
        throw error
     }
 
-    const post = new Post({
-        title : title,
-        content : content,
-        imageUrl : imageUrl,
-        user : req.userId,
-        date : new Date()
-    })
-    post.save()
-    .then(result => {
-        return User.findById(req.userId)
-    })
+    let user = null;
+    let post = null;
+
+    User.findOne({username : username})
     .then(creator => {
-        
         user = creator
-        user.posts.push(post)
-        console.log(user)
+        post = new Post({
+            content : content,
+            imageUrl : imageUrl,
+            user : {
+                name : creator.name,
+                username : creator.username,
+                avatar : creator.imageProfile
+            },
+            date : new Date()
+        })
+        return post.save()
+    })
+    .then(result => {
+        user.posts.unshift(post)
         return user.save()
     })
     .then(result => {
-        res.status(201).json({
-            message : 'Status Posted!',
-            post : post,
-            user : {
-                _id : user._id,
-                name : user.name
-            }
-        })
+        res.status(201).json({msg : 'succes', post : post})
     })
+    
     .catch(err => {
         if(!err.statusCode) {
             err.statusCode = 500

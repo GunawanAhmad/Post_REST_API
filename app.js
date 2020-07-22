@@ -37,6 +37,10 @@ app.use(multer({storage : fileStorage, fileFilter : filterImg}).fields([
     {
         name : 'avatar',
         maxCount : 1
+    },
+    {
+        name : 'image',
+        maxCount : 1
     }
 ]))
 // app.use(multer({storage : fileStorage, fileFilter : filterImg}).single('userPhoto'))
