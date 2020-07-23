@@ -18,6 +18,5 @@ router.delete('/delete/:postId',isAuth, feed.deletePost)
 router.put('/edit/:postId',isAuth, feed.editPost)
 
 
-
 module.exports = router
 

@@ -7,6 +7,7 @@ const authControl = require('../controller/auth')
 
 
 
+
 router.post('/signup', authControl.createUser)
 
 router.post('/login', authControl.login)

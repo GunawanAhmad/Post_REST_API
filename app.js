@@ -2,6 +2,7 @@ const express = require('express')
 const feedRoute = require('./routes/feed')
 const authRoute = require('./routes/auth')
 const userRoute = require('./routes/user')
+const postRoute = require('./routes/post')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const path = require('path')
@@ -56,6 +57,7 @@ app.use((req,res,next)=> {
 app.use('/feed',feedRoute)
 app.use(authRoute)
 app.use(userRoute)
+app.use(postRoute)
 
 app.use((error, req, res, next) => {
     const status = error.statusCode || 500;

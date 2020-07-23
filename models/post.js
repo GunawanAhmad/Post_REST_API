@@ -13,10 +13,23 @@ const postSchema = new Schema({
         type : Object,
         required : true
     },
+    like : {
+        type : Number
+    },
     date : {
         type : String,
         required : true
-    }
+    },
+    comment : [{
+        content : {
+            type : String,
+            required : true
+        },
+        user : {
+            type : Schema.Types.ObjectId,
+            required : true
+        }
+    }]
 }, {timestamps : true})
 
 module.exports = mongoose.model('Post', postSchema)

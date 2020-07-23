@@ -55,7 +55,9 @@ exports.createPost = (req,res,next) => {
                 username : creator.username,
                 avatar : creator.imageProfile
             },
-            date : new Date()
+            date : new Date(),
+            like : 0,
+            comment : []
         })
         return post.save()
     })
@@ -142,4 +144,6 @@ exports.editPost = (req,res,next) => {
     .catch(err => {
         next(err)
     })
+    
 }
+
